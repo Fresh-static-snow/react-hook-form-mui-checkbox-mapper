@@ -1,26 +1,106 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormLabel
+} from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
 
-function App() {
+
+interface FruitsFormData {
+  fruits: string[];
+}
+
+export default function App() {
+  const { control, handleSubmit } = useForm<FruitsFormData>({
+    defaultValues: {
+      fruits: []
+    }
+  });
+
+  const fruitOptions = [
+    {
+      label: "🍏",
+      value: "apple"
+    },
+    {
+      label: "🍊",
+      value: "orange"
+    },
+    {
+      label: "🍌",
+      value: "banana"
+    },
+    {
+      label: "🍓",
+      value: "strawberrie"
+    }
+  ];
+
+  const onSubmit = (values: FruitsFormData): void => {
+    alert( values.fruits);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <form
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        padding: 20
+      }}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <FormControl component="fieldset" variant="standard">
+        <FormLabel component="legend">Fruits</FormLabel>
+        <FormGroup>
+          <Controller
+            name="fruits"
+            control={control}
+            render={({ field }) => (
+              <>
+                {fruitOptions.map((fruitOption) => (
+                  <FormControlLabel
+                    key={fruitOption.value}
+                    label={fruitOption.label}
+                    control={
+                      <Checkbox
+                        value={fruitOption.value}
+                        
+                        checked={field.value.some(
+                          (existingValue) => existingValue === fruitOption.value
+                        )}
+                        onChange={(event, checked) => {
+                          if (checked) {
+                            field.onChange([
+                              ...field.value,
+                              event.target.value
+                            ]);
+                          } else {
+                            field.onChange(
+                              field.value.filter(
+                                (value) => value !== event.target.value
+                              )
+                            );
+                          }
+                        }}
+                      />
+                    }
+                  />
+                ))}
+              </>
+            )}
+          />
+        </FormGroup>
+      </FormControl>
+
+      <Button variant="contained" type="submit">
+        Submit
+      </Button>
+    </form>
   );
 }
 
-export default App;
+
